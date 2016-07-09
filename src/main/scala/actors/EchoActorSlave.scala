@@ -5,22 +5,26 @@ import exceptions.{BoomException, NotSoDangerousException, NuclearExplosionExcep
 
 
 object EchoActorSlave {
-  def props(): Props = {
-    Props(classOf[EchoActorSlave])
+  def props(initialState: String): Props = {
+    Props(classOf[EchoActorSlave], initialState)
   }
 }
 
-class EchoActorSlave extends Actor with ActorLogging {
+class EchoActorSlave (initialState: String)extends Actor with ActorLogging {
+
+  var phrasesTreated: String = initialState
 
   override def postRestart(reason: Throwable): Unit = {
     super.postRestart(reason)
-    log.info("I've been restarted, something went somewhat wrong :/")
+    log.info(s"I've been restarted, something went somewhat wrong :/ my state is ${phrasesTreated}")
   }
 
     override def receive: Receive = {
       case e @ EchoActor.MessageToEcho("Plop") => throw new NotSoDangerousException(message = Some(s"There was some explosions right here -> ${Some(e.toString)}, as usual, continuing my job, boys."))
       case e @ EchoActor.MessageToEcho("Boom") => throw new BoomException(message = Some(s"There was some explosions right here -> ${Some(e.toString)} need to restart"))
-      case e @ EchoActor.MessageToEcho("DoomsDay") => throw new NuclearExplosionException(message = Some(s"THE END IS NEAR!!! -> ${Some(e.toString)} WE ARE DOOMED! DEATH!!!"))
-      case EchoActor.MessageToEcho(message) => log.info(s"I've received the following text: $message")
+      case e @ EchoActor.MessageToEcho("DoomsDay") => throw new NuclearExplosionException(message = Some(s"THE END IS COMING!!! -> ${Some(e.toString)} WE ARE DOOMED! DEATH!!!"))
+      case EchoActor.MessageToEcho(message) =>
+        phrasesTreated = s"$phrasesTreated $message"
+        log.info(s"I've received the following text: $message and my state is $phrasesTreated")
   }
 }

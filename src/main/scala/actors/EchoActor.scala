@@ -27,7 +27,7 @@ class EchoActor extends Actor with ActorLogging {
   }
 
   override def preStart: Unit = {
-    echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props(), "echoActorSlave")
+    echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props("initial"), "echoActorSlave")
     context.watch(echoActorExecutorActorRef)
   }
 
@@ -39,7 +39,7 @@ class EchoActor extends Actor with ActorLogging {
     case message: MessageToEcho => echoActorExecutorActorRef ! message
     case Terminated(actorRef) =>
       log.info(s"My slave $actorRef is dead. Whatever man! I gonna buy a new one.")
-      echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props(), "echoActorSlave")
+      echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props("initial"), "echoActorSlave")
       context.watch(echoActorExecutorActorRef)
   }
 }
