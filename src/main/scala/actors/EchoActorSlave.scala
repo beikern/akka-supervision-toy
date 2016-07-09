@@ -10,7 +10,7 @@ object EchoActorSlave {
   }
 }
 
-class EchoActorSlave (initialState: String)extends Actor with ActorLogging {
+class EchoActorSlave (initialState: String) extends Actor with ActorLogging {
 
   var phrasesTreated: String = initialState
 

@@ -14,6 +14,7 @@ object EchoActor {
 
 class EchoActor extends Actor with ActorLogging {
 
+  var initialSlaveState: String = _
   var echoActorExecutorActorRef: ActorRef = _
 
   val customDecider: Decider = {
@@ -27,7 +28,8 @@ class EchoActor extends Actor with ActorLogging {
   }
 
   override def preStart: Unit = {
-    echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props("initial"), "echoActorSlave")
+    initialSlaveState = "initial"
+    echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props(initialSlaveState), "echoActorSlave")
     context.watch(echoActorExecutorActorRef)
   }
 
@@ -36,10 +38,13 @@ class EchoActor extends Actor with ActorLogging {
   }
 
   override def receive: Receive = {
+    case MessageToEcho(message) if (message.startsWith("changeState:")) =>
+      initialSlaveState = message.splitAt(12)._2
+      log.info(s"Initial state for echoActorSlaves changed to $initialSlaveState")
     case message: MessageToEcho => echoActorExecutorActorRef ! message
     case Terminated(actorRef) =>
       log.info(s"My slave $actorRef is dead. Whatever man! I gonna buy a new one.")
-      echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props("initial"), "echoActorSlave")
+      echoActorExecutorActorRef = context.actorOf(EchoActorSlave.props(initialSlaveState), "echoActorSlave")
       context.watch(echoActorExecutorActorRef)
   }
 }
