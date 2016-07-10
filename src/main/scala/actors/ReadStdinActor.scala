@@ -28,7 +28,6 @@ class ReadStdinActor (echoDest: ActorRef)extends Actor with ActorLogging {
             echoDest ! EchoActor.MessageToEcho(ln)
           case _ =>
         }
-
       }
   }
 }

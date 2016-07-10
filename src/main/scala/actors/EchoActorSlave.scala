@@ -13,7 +13,7 @@ object EchoActorSlave {
 class EchoActorSlave (initialState: List[String]) extends Actor with ActorLogging {
 
   var phrasesTreated: List[String] = initialState
-
+  phrasesTreated.toString()
   override def postRestart(reason: Throwable): Unit = {
     super.postRestart(reason)
     log.info(s"I've been restarted, something went somewhat wrong :/ my state is $phrasesTreated")
